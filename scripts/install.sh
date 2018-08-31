@@ -53,7 +53,6 @@ echo 'INSTALLER: Environment variables set'
 
 unzip /vagrant/linux*122*.zip -d /vagrant
 cp /vagrant/ora-response/db_install.rsp.tmpl /vagrant/ora-response/db_install.rsp
-cp /vagrant/ora-response/ords_params.properties.tmpl /vagrant/ora-response/ords_params.properties
 sed -i -e "s|###ORACLE_BASE###|$ORACLE_BASE|g" /vagrant/ora-response/db_install.rsp && \
 sed -i -e "s|###ORACLE_HOME###|$ORACLE_HOME|g" /vagrant/ora-response/db_install.rsp && \
 sed -i -e "s|###ORACLE_EDITION###|$ORACLE_EDITION|g" /vagrant/ora-response/db_install.rsp
@@ -119,7 +118,10 @@ echo 'INSTALLER: Database created'
 sed '$s/N/Y/' /etc/oratab | sudo tee /etc/oratab > /dev/null
 echo 'INSTALLER: Oratab configured'
 
-java -jar ords.war --parameterFile /vagrant/ora-response/ords_params.properties
+
+su -l oracle -c "java -Dconfig.dir=$ORACLE_BASE/ords/conf/ -jar $ORACLE_BASE/ords/ords.war install simple --preserveParamFile > $ORACLE_BASE/ords/install.log" &
+sleep 1m
+echo 'INSTALLER: Oracle ORDS Installed'
 
 
 # configure systemd to start oracle instance on startup
