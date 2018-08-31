@@ -50,7 +50,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
        "ORACLE_PDB"          => "ORCLPDB1",
        "ORACLE_CHARACTERSET" => "AL32UTF8",
        "ORACLE_EDITION"      => "EE",
-	   "ORACLE_PWD"          => "oracle"
+       "ORACLE_PWD"          => "oracle"
     }
 
 end
