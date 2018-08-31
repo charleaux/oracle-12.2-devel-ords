@@ -27,7 +27,7 @@ echo 'INSTALLER: Locale set'
 
 # Install Oracle Database prereq and openssl packages
 yum install -y oracle-database-server-12cR2-preinstall openssl
-yum localinstall -y jdk-8u181-linux-x64.rpm
+yum localinstall -y /vagrant/jdk-8u181-linux-x64.rpm
 
 echo 'INSTALLER: Oracle preinstall and openssl complete'
 
