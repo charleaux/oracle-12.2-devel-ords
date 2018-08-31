@@ -27,11 +27,14 @@ echo 'INSTALLER: Locale set'
 
 # Install Oracle Database prereq and openssl packages
 yum install -y oracle-database-server-12cR2-preinstall openssl
+yum localinstall -y jdk-8u181-linux-x64.rpm
 
 echo 'INSTALLER: Oracle preinstall and openssl complete'
 
 # create directories
-mkdir -p $ORACLE_BASE/ords && \
+mkdir -p $ORACLE_BASE/ords/conf && \
+unzip /vagrant/ords*18*.zip -d $ORACLE_BASE/ords && \
+cp -f /vagrant/ora-response/ords_params.properties.tmpl $ORACLE_BASE/ords/params/ords_params.properties
 chown oracle:oinstall -R $ORACLE_BASE && \
 mkdir -p /u01/app && \
 ln -s $ORACLE_BASE /u01/app/oracle
@@ -49,7 +52,6 @@ echo 'INSTALLER: Environment variables set'
 # Install Oracle
 
 unzip /vagrant/linux*122*.zip -d /vagrant
-unzip /vagrant/ords*18*.zip -d $ORACLE_BASE/ords
 cp /vagrant/ora-response/db_install.rsp.tmpl /vagrant/ora-response/db_install.rsp
 cp /vagrant/ora-response/ords_params.properties.tmpl /vagrant/ora-response/ords_params.properties
 sed -i -e "s|###ORACLE_BASE###|$ORACLE_BASE|g" /vagrant/ora-response/db_install.rsp && \
@@ -116,6 +118,9 @@ echo 'INSTALLER: Database created'
 
 sed '$s/N/Y/' /etc/oratab | sudo tee /etc/oratab > /dev/null
 echo 'INSTALLER: Oratab configured'
+
+java -jar ords.war --parameterFile /vagrant/ora-response/ords_params.properties
+
 
 # configure systemd to start oracle instance on startup
 sudo cp /vagrant/scripts/oracle-rdbms.service /etc/systemd/system/
