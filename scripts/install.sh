@@ -31,7 +31,7 @@ yum install -y oracle-database-server-12cR2-preinstall openssl
 echo 'INSTALLER: Oracle preinstall and openssl complete'
 
 # create directories
-mkdir -p $ORACLE_BASE && \
+mkdir -p $ORACLE_BASE/ords && \
 chown oracle:oinstall -R $ORACLE_BASE && \
 mkdir -p /u01/app && \
 ln -s $ORACLE_BASE /u01/app/oracle
@@ -49,7 +49,9 @@ echo 'INSTALLER: Environment variables set'
 # Install Oracle
 
 unzip /vagrant/linux*122*.zip -d /vagrant
+unzip /vagrant/ords*18*.zip -d $ORACLE_BASE/ords
 cp /vagrant/ora-response/db_install.rsp.tmpl /vagrant/ora-response/db_install.rsp
+cp /vagrant/ora-response/ords_params.properties.tmpl /vagrant/ora-response/ords_params.properties
 sed -i -e "s|###ORACLE_BASE###|$ORACLE_BASE|g" /vagrant/ora-response/db_install.rsp && \
 sed -i -e "s|###ORACLE_HOME###|$ORACLE_HOME|g" /vagrant/ora-response/db_install.rsp && \
 sed -i -e "s|###ORACLE_EDITION###|$ORACLE_EDITION|g" /vagrant/ora-response/db_install.rsp
