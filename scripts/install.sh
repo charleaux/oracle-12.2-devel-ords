@@ -118,11 +118,36 @@ echo 'INSTALLER: Database created'
 sed '$s/N/Y/' /etc/oratab | sudo tee /etc/oratab > /dev/null
 echo 'INSTALLER: Oratab configured'
 
-
-su -l oracle -c "java -Dconfig.dir=$ORACLE_BASE/ords/conf/ -jar $ORACLE_BASE/ords/ords.war install simple --preserveParamFile > $ORACLE_BASE/ords/install.log" &
+su -l oracle -c "java -jar $ORACLE_BASE/ords/ords.war configdir $ORACLE_BASE/ords/conf/"
+sleep 10
+su -l oracle -c "java -jar $ORACLE_BASE/ords/ords.war install simple --preserveParamFile > $ORACLE_BASE/ords/install.log" &
 sleep 1m
 echo 'INSTALLER: Oracle ORDS Installed'
 
+su -l oracle -c "sqlplus / as sysdba <<EOF
+  ALTER SESSION SET CONTAINER=orclpdb1;
+  CREATE USER sodauser IDENTIFIED BY oracle
+    DEFAULT TABLESPACE users QUOTA UNLIMITED ON users;
+  GRANT CREATE SESSION, CREATE TABLE TO sodauser;
+  GRANT SODA_APP TO sodauser;
+EOF"
+
+su -l oracle -c "sqlplus / as sysdba <<EOF
+  ALTER SESSION SET CONTAINER=orclpdb1;
+  /
+  connect sodauser/oracle@orclpdb1;
+  /
+  EXEC ords.enable_schema;
+  COMMIT;
+  /
+  BEGIN
+    ords.delete_privilege_mapping(
+      'oracle.soda.privilege.developer',
+      '/soda/*');
+    COMMIT;
+  END;
+  /
+EOF"
 
 # configure systemd to start oracle instance on startup
 sudo cp /vagrant/scripts/oracle-rdbms.service /etc/systemd/system/
