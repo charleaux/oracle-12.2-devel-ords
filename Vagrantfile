@@ -22,6 +22,11 @@ NAME = "oracle-12201-vagrant"
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "ol7-latest"
   config.vm.box_url = "https://yum.oracle.com/boxes/oraclelinux/latest/ol7-latest.box"
+  if File.exists?('./ol7-latest.box')
+    config.vm.box_url = "./ol7-latest.box"
+  else
+    config.vm.box_url = "https://yum.oracle.com/boxes/oraclelinux/latest/ol7-latest.box"
+  end
   config.vm.define NAME
   
   
